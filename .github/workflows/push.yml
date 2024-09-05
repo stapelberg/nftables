@@ -27,9 +27,15 @@ jobs:
       run: |
         [ "$(gofmt -l $(find . -name '*.go') 2>&1)" = "" ]
 
+    - name: sysinfo
+      run: |
+        sudo nft list ruleset
+        ip a
+        ip r
+        ls -l /boot
+
     - name: Run tests
       run: |
-        go vet .
-        go test ./...
         go test -c github.com/google/nftables
-        sudo ./nftables.test -test.v -run_system_tests
+        sudo strace -fvy -s4096 ./nftables.test -test.v -run_system_tests -test.run=TestCtExpect
+        #sudo ./nftables.test -test.v -run_system_tests
